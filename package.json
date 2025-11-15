@@ -1,0 +1,10 @@
+{
+  "name": "telegram-music-pages",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev worker/worker.js --local",
+    "publish:worker": "wrangler publish",
+    "deploy": "wrangler publish && echo 'Pages deploy via GH Actions (push to main)'"
+  }
+}

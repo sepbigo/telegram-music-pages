@@ -1,0 +1,13 @@
+
+name = "telegram-music-worker-api"
+main = "worker/worker.js"
+compatibility_date = "2025-11-15"
+
+# Bindings - set these in Cloudflare dashboard or via wrangler publish with env
+[[d1_databases]]
+binding = "MUSIC_D1"
+database_name = "music_d1"
+
+[vars]
+# API_BASE_URL will be used by Pages front-end (set in Pages settings)
+# API_BASE_URL = "https://your-worker-domain.workers.dev"
