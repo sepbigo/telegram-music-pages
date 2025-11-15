@@ -1,5 +1,5 @@
 
-name = "telegram-music-worker-api"
+name = "telegram-music-back"
 main = "worker/worker.js"
 compatibility_date = "2025-11-15"
 
