@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>管理 · 白 · 音乐库</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+<main class="container">
+  <header class="header"><h1 class="title">管理后台</h1><p class="subtitle">频道封面 / 介绍 · 管理员登录</p></header>
+  <div class="admin-wrap">
+    <div id="loginBox">
+      <div class="field"><input id="username" class="input" placeholder="用户名 (默认 admin)" /></div>
+      <div class="field"><input id="password" type="password" class="input" placeholder="密码" /></div>
+      <div class="field"><button id="loginBtn" class="btn">登录</button></div>
+      <div id="loginMsg"></div>
+    </div>
+
+    <div id="panel" style="display:none">
+      <h3>频道设置</h3>
+      <div class="field"><select id="channelSelect" class="input"></select></div>
+      <div class="field"><input id="cover" class="input" placeholder="封面图片 URL" /></div>
+      <div class="field"><input id="ctitle" class="input" placeholder="频道标题 (可选)" /></div>
+      <div class="field"><textarea id="desc" class="input" placeholder="频道描述"></textarea></div>
+      <div class="field"><button id="saveChannel" class="btn">保存</button></div>
+      <div id="saveMsg"></div>
+      <hr/>
+      <div><button id="logoutBtn" class="btn">登出</button></div>
+    </div>
+  </div>
+</main>
+<script src="/config.js"></script>
+<script>
+const API = window.API_BASE_URL || '';
+
+async function api(path, opts={}) {
+  const headers = opts.headers || {};
+  if (localStorage.getItem('tm_admin_token')) headers['Authorization'] = 'Bearer ' + localStorage.getItem('tm_admin_token');
+  opts.headers = Object.assign({'Content-Type':'application/json'}, headers);
+  const res = await fetch((API||'') + path, opts);
+  return res.json();
+}
+
+const loginBtn = document.getElementById('loginBtn');
+const loginMsg = document.getElementById('loginMsg');
+const loginBox = document.getElementById('loginBox');
+const panel = document.getElementById('panel');
+
+loginBtn.addEventListener('click', async ()=>{
+  const username = document.getElementById('username').value || 'admin';
+  const password = document.getElementById('password').value;
+  const j = await api('/api/admin/login', { method:'POST', body: JSON.stringify({ username, password })});
+  if (j.token) {
+    localStorage.setItem('tm_admin_token', j.token);
+    loginBox.style.display='none'; panel.style.display='block';
+    loadChannels();
+  } else {
+    loginMsg.textContent = j.error || '登录失败';
+  }
+});
+
+async function loadChannels(){
+  const j = await api('/api/channels');
+  const channels = j.channels || {};
+  const select = document.getElementById('channelSelect');
+  select.innerHTML = '';
+  for(const id of Object.keys(channels)) {
+    const opt = document.createElement('option'); opt.value=id; opt.textContent = channels[id].title || id;
+    select.appendChild(opt);
+  }
+  if(select.options.length) select.selectedIndex=0;
+  fillChannel();
+}
+
+function fillChannel(){
+  const sel = document.getElementById('channelSelect');
+  if(!sel.value) return;
+  api('/api/channels').then(j=>{
+    const meta = j.channels[sel.value] || {};
+    document.getElementById('cover').value = meta.cover||'';
+    document.getElementById('desc').value = meta.description||'';
+    document.getElementById('ctitle').value = meta.title||'';
+  });
+}
+
+document.getElementById('saveChannel').addEventListener('click', async ()=>{
+  const id = document.getElementById('channelSelect').value;
+  const cover = document.getElementById('cover').value;
+  const title = document.getElementById('ctitle').value;
+  const description = document.getElementById('desc').value;
+  const j = await api('/api/channel/' + encodeURIComponent(id), { method:'POST', body: JSON.stringify({ cover, title, description })});
+  document.getElementById('saveMsg').textContent = j.ok ? '保存成功' : ('保存失败: '+(j.error||''));
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async ()=>{
+  await api('/api/admin/logout', { method:'POST' });
+  localStorage.removeItem('tm_admin_token');
+  panel.style.display='none'; loginBox.style.display='block';
+});
+
+window.addEventListener('load', ()=>{
+  if(localStorage.getItem('tm_admin_token')) { loginBox.style.display='none'; panel.style.display='block'; loadChannels(); }
+});
+</script>
+</body>
+</html>

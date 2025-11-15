@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>白 · 音乐库</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+<main class="container">
+  <header class="header">
+    <div>
+      <h1 class="title">白 · 音乐库</h1>
+      <p class="subtitle">从 Telegram 机器人 / 频道读取的歌曲 · 支持频道分组与在线播放</p>
+    </div>
+    <div class="header-actions">
+      <button id="themeToggle" class="btn">切换主题</button>
+      <a href="/admin.html" class="btn">管理后台</a>
+    </div>
+  </header>
+
+  <section class="controls">
+    <input id="searchInput" class="search" placeholder="搜索歌曲 / 演唱者 / 文件名" />
+    <div class="pager">
+      <button id="prevBtn" class="btn">上一页</button>
+      <span id="pageInfo"></span>
+      <button id="nextBtn" class="btn">下一页</button>
+    </div>
+  </section>
+
+  <section id="playerPanel" class="player-panel hidden">
+    <div class="now">
+      <div id="nowTitle" class="now-title">正在播放</div>
+      <div id="nowMeta" class="now-meta"></div>
+    </div>
+    <audio id="audio" controls preload="none"></audio>
+    <div class="queue" id="queue"></div>
+  </section>
+
+  <section id="list" class="list">
+    <div id="loading" class="loading">加载中……</div>
+  </section>
+
+  <footer class="footer">
+    <small>部署于 Cloudflare Pages · 后端 API 驱动于 Cloudflare Worker</small>
+  </footer>
+</main>
+<script src="/config.js"></script>
+<script src="/script.js"></script>
+</body>
+</html>
